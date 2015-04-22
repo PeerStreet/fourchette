@@ -76,8 +76,12 @@ class Fourchette::Heroku
           logger.info "Retrying (#{tries})..."
           retry
         else
-          raise
+          raise e
         end
+      rescue Exception => e
+        logger.error "Failed to copy addon #{name}"
+        logger.error e
+        raise e
       end
     end
   end
