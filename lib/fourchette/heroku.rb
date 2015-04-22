@@ -64,6 +64,7 @@ class Fourchette::Heroku
       # force hobby tier for the database addon since we can't do pg:wait and pgbackups fails when the production tier db isn't ready yet
       name = 'heroku-postgresql:hobby-basic' if name.start_with?('heroku-postgresql')
       name = 'rediscloud' if name.start_with?('rediscloud')
+      name = 'logentries:tryit' if name.start_with?('logentries')
 
       begin
         tries ||= 0
