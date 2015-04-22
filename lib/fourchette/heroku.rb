@@ -1,12 +1,6 @@
 class Fourchette::Heroku
   include Fourchette::Logger
 
-  EXCEPTIONS = [
-    Excon::Errors::UnprocessableEntity,
-    Excon::Errors::ServiceUnavailable,
-    Excon::Errors::HTTPStatusError
-  ]
-
   def app_exists?(name)
     client.app.list.collect do |app|
       app if app['name'] == name
@@ -75,7 +69,7 @@ class Fourchette::Heroku
         tries ||= 0
         logger.info "Adding #{name} to #{to}"
         client.addon.create(to, plan: name)
-      rescue *EXCEPTIONS => e
+      rescue Exception => e
         logger.error "Failed to copy addon #{name}"
         logger.error e
         if (tries += 1) <= 3
@@ -84,10 +78,6 @@ class Fourchette::Heroku
         else
           @github.comment_pr(@pr_number, "Failed to copy addon: #{name}")
         end
-      rescue Exception => e
-        logger.error "Failed to copy addon #{name}"
-        logger.error e
-        raise e
       end
     end
   end
