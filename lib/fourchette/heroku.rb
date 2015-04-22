@@ -59,7 +59,7 @@ class Fourchette::Heroku
     client.config_var.update(to, from_congig_vars)
   end
 
-  def copy_add_ons(from, to, github, pr_number)
+  def copy_add_ons(from, to)
     logger.info "Copying addons from #{from} to #{to}"
     from_addons = client.addon.list(from)
     from_addons.each do |addon|
