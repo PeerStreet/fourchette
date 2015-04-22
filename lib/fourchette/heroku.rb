@@ -3,7 +3,8 @@ class Fourchette::Heroku
 
   EXCEPTIONS = [
     Excon::Errors::UnprocessableEntity,
-    Excon::Errors::ServiceUnavailable
+    Excon::Errors::ServiceUnavailable,
+    Excon::Errors::HTTPStatusError
   ]
 
   def app_exists?(name)
@@ -12,7 +13,10 @@ class Fourchette::Heroku
     end.reject(&:nil?).any?
   end
 
-  def fork(from, to)
+  def fork(from, to, github, pr_number)
+    @github = github
+    @pr_number = pr_number
+
     create_app(to)
     copy_config(from, to)
     copy_add_ons(from, to)
@@ -51,10 +55,11 @@ class Fourchette::Heroku
       k.start_with?('HEROKU_POSTGRESQL_') && k.end_with?('_URL')
     end
     from_congig_vars.reject! { |k, _v| k == ('DATABASE_URL') }
+    from_congig_vars.reject! { |k, _v| k == ('REDISCLOUD_URL') }
     client.config_var.update(to, from_congig_vars)
   end
 
-  def copy_add_ons(from, to)
+  def copy_add_ons(from, to, github, pr_number)
     logger.info "Copying addons from #{from} to #{to}"
     from_addons = client.addon.list(from)
     from_addons.each do |addon|
@@ -77,7 +82,7 @@ class Fourchette::Heroku
           logger.info "Retrying (#{tries})..."
           retry
         else
-          raise e
+          @github.comment_pr(@pr_number, "Failed to copy addon: #{name}")
         end
       rescue Exception => e
         logger.error "Failed to copy addon #{name}"

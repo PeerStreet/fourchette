@@ -55,7 +55,7 @@ class Fourchette::Fork
 
   def create_unless_exists
     unless app_exists?
-      @heroku.fork(ENV['FOURCHETTE_HEROKU_APP_TO_FORK'], fork_name)
+      @heroku.fork(ENV['FOURCHETTE_HEROKU_APP_TO_FORK'], fork_name, @github, pr_number)
       post_fork_url
     end
   end
