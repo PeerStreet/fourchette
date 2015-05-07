@@ -75,6 +75,7 @@ class Fourchette::Heroku
         logger.error e
         if (tries += 1) <= 3
           logger.info "Retrying (#{tries})..."
+          sleep 15
           retry
         else
           @github.comment_pr(@pr_number, "Failed to copy addon: #{name}")
