@@ -50,6 +50,9 @@ class Fourchette::Heroku
     end
     from_congig_vars.reject! { |k, _v| k == ('DATABASE_URL') }
     from_congig_vars.reject! { |k, _v| k == ('REDISCLOUD_URL') }
+    from_congig_vars.reject! { |k, _v| k == ('ROLLBAR_ACCESS_TOKEN') }
+    from_congig_vars.reject! { |k, _v| k == ('NEW_RELIC_LICENSE_KEY') }
+    from_congig_vars.reject! { |k, _v| k == ('SENDGRID_PASSWORD') }
     client.config_var.update(to, from_congig_vars)
   end
 
